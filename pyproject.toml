@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools >= 61", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "league-rpc-linux"
+dynamic = ["version"]
+requires-python = ">= 3.8"
+dependencies = [
+    "pypresence >= 4.3.0",
+    "psutil >= 5.9.6",
+    "requests >= 2.31.0"
+]
+
+[tool.setuptools]
+packages = ["league_rpc_linux", "league_rpc_linux.processes"]
+
+[tool.setuptools_scm]
+
