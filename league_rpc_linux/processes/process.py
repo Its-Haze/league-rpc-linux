@@ -117,10 +117,11 @@ def check_discord_process(
 
     print(f"{Colors.green}Discord is running! {Colors.dgray}(2/2){Colors.reset}")
 
+    pipe = 0
     for _ in range(5):
         time.sleep(3)
         try:
-            rpc = pypresence.Presence(client_id)
+            rpc = pypresence.Presence(client_id, pipe=pipe)
             rpc.connect()
             break
         except pypresence.exceptions.InvalidID:
@@ -145,6 +146,12 @@ def check_discord_process(
             time.sleep(1)
             continue
         except ConnectionRefusedError:
+            ipcs = check_discord_ipc()
+            if pipe + 1 < len(ipcs):
+               # Failed to connect, retry with next one
+               pipe += 1
+               continue
+
             print(
                 f"""
             {Colors.red}PyPresence encountered some problems, and could not connect to your Discord's RPC
@@ -156,15 +163,15 @@ def check_discord_process(
                 """
             )
             # If process names were not found, but ipc exists. Try removing them & restarting
-            if len((val := check_discord_ipc())) > 1:
+            if len(ipcs) > 1:
                 print(
                     f"""
                 {Colors.red}Detected multiple ipc's running.{Colors.reset}
                 You seem to have more than 1 ipc running (which is unusual).
                 If you know that discord is running, but pypresence keep failing to connect.
                 It might be cause you have multiple ipc's running. try removing the following ipc's and {Colors.green}restart discord.{Colors.reset}
-                {Colors.yellow}ipc's: {' , '.join(val)}{Colors.reset}
-                run: ``{Colors.green}rm  {' '.join(val)}{Colors.reset}``
+                {Colors.yellow}ipc's: {' , '.join(ipcs)}{Colors.reset}
+                run: ``{Colors.green}rm  {' '.join(ipcs)}{Colors.reset}``
                 Or you just don't have discord up and running..
                         """
                 )
