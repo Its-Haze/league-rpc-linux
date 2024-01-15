@@ -61,6 +61,16 @@ while [[ $# -gt 0 ]]; do
         AUTO_INSTALL=true
         shift
         ;;
+    --add-process)
+      if [ -n "$2" ]; then
+        process="$2"
+        log_message "Selected process: $process"
+        shift 2
+      else
+        log_message "Error: Argument required for --add-process" 
+        exit 1
+      fi
+      ;;
     *)
         log_message "Unknown option: $1"
         exit 1
@@ -82,4 +92,10 @@ fi
 
 # Execute the program
 log_message "Executing the program..."
-exec "$EXECUTABLE_PATH" --wait-for-league -1 --wait-for-discord -1
+if [ -z "$process" ]; then
+    log_message "using custom discord process: $process"
+    exec exec "$EXECUTABLE_PATH" --wait-for-league -1 --wait-for-discord -1 --add-process "$process" 
+else
+    log_message "using default discord process"
+    exec "$EXECUTABLE_PATH" --wait-for-league -1 --wait-for-discord -1
+fi
